@@ -1,7 +1,5 @@
 import os
-# import boto3
 import pandas as pd
-# import psycopg2
 from io import StringIO
 from utils.constants import *
 from utils.s3_utils import *
@@ -22,9 +20,13 @@ def lambda_handler(event, context):
     df = pd.read_csv(StringIO(csv_content))
 
     # Data Cleaning Steps
-    # 1. Drop rows where mandatory fields are empty
-    mandatory_cols = ["id", "name", "age", "phone", "email"]
+    # 1. Drop rows where mandatory fields are empty and fill the values as unknown and 0
+    mandatory_cols = ["id", "name", "age","phone"]
+    cols_1=["email","city"]
+    
     df.dropna(subset=mandatory_cols, inplace=True)
+    df[cols_1] = df[cols_1].fillna('unknown')
+    df["salary"].fillna(0, inplace=True)
 
     # 2. Correct data types
     df["id"] = pd.to_numeric(df["id"], errors="coerce")
